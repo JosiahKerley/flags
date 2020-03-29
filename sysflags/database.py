@@ -1,4 +1,6 @@
+#!/usr/bin/env python
 from .strategies import *
+from . import utils
 import os
 import re
 import sys
@@ -6,7 +8,7 @@ import dpath.util
 import pickle
 from pathlib import Path
 from datetime import datetime
-
+dpath.options.ALLOW_EMPTY_STRING_KEYS = True
 
 
 class Database:
@@ -61,12 +63,12 @@ class Database:
     return True
 
   def _setup_dirs(self):
-    print(f'Creating directory {self._get_database_filedir()}')
     try:
       if not os.path.exists(self._get_database_filedir()):
         os.makedirs(self._get_database_filedir())
+        utils.eprint(f'Creating directory {self._get_database_filedir()}')
     except:
-      print(f'Cannot create directory {self._get_database_filedir()}')
+      utils.eprint(f'Cannot create directory {self._get_database_filedir()}')
 
   def _setup_files(self):
     if self.snapshot == 'current':
@@ -79,7 +81,7 @@ class Database:
             file_extenstion=self._file_extenstion
           )
           empty_snapshot_filepath = self._get_database_filepath(subpath)
-          print(f'Creating empty db file {empty_snapshot_filepath}')
+          utils.eprint(f'Creating empty db file {empty_snapshot_filepath}')
           assert self._bootstrap_empty_file(empty_snapshot_filepath)
           os.symlink(empty_snapshot_filepath, self._get_database_filepath())
       return True
@@ -134,7 +136,7 @@ class Database:
   def values(self, query: str):
     return dpath.util.values(self._get_data(), query)
 
-  def set(self, query: str, value, writeback=True, recurse=True):
+  def set(self, query: str, value=None, writeback=True, recurse=True):
     if recurse:
       retval = dpath.util.new(self._get_data(), query, value)
     else:

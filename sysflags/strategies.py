@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import dpath.util
 
 class Strategy:
